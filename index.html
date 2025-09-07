@@ -3,37 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SKYLINES eWallet Portal Registration</title>
+<title>SKYLINES eWallet Registration</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-html, body { height: 100%; margin:0; font-family: 'Montserrat', sans-serif; background:#f5f5f5; display:flex; flex-direction:column; }
-body { min-height: 100vh; }
-.form-container { background:#fff; padding:30px; border:1px solid #000; width:450px; box-sizing:border-box; margin:40px auto; flex:none; }
-.header { text-align:left; margin-bottom:15px; }
-.header p:first-child { font-weight:bold; font-size:16px; margin:0 0 5px 0; }
+html, body { margin:0; font-family:'Montserrat',sans-serif; background:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; }
+.form-container { background:#fff; padding:25px; border:1px solid #000; width:450px; margin:20px auto; flex:none; }
+.header { margin-bottom:15px; }
+.header p:first-child { font-weight:bold; font-size:16px; margin:0 0 5px; }
 .info-note { font-size:14px; color:#555; line-height:1.5; margin:0; }
-.step-hint { font-size:13px; margin-bottom:10px; font-weight:700; }
 .form-step { display:none; } .form-step.active { display:block; }
 .form-field { display:flex; align-items:center; margin:8px 0; gap:10px; }
 .form-field label { width:120px; font-weight:bold; font-size:14px; }
 .form-field input { flex:1; padding:12px 15px; border-radius:25px; border:1px solid #000; font-size:15px; }
 .form-field input:focus { outline:none; border-color:#007bff; }
 .button-group { display:flex; justify-content:space-between; margin-top:15px; gap:10px; }
-.btn { flex:1; padding:12px; border-radius:50px; border:1px solid #000; font-weight:bold; font-size:15px; cursor:pointer; background:transparent; transition:all 0.2s ease; color:#000; }
-.btn-next { border-color:#007bff; color:#007bff; } .btn-next:hover { background-color:#007bff; color:#fff; }
-.btn-back { border-color:#555; color:#555; } .btn-back:hover { background-color:#555; color:#fff; }
-.btn-batalkan { border-color:#ff5f00; color:#ff5f00; } .btn-batalkan:hover { background-color:#ff5f00; color:#fff; }
+.btn { flex:1; padding:12px; border-radius:50px; border:1px solid #000; font-weight:bold; font-size:15px; cursor:pointer; background:transparent; transition:all 0.2s; color:#000; }
+.btn-next { border-color:#007bff; color:#007bff; } .btn-next:hover { background:#007bff; color:#fff; }
+.btn-back { border-color:#555; color:#555; } .btn-back:hover { background:#555; color:#fff; }
+.btn-batalkan { border-color:#ff5f00; color:#ff5f00; } .btn-batalkan:hover { background:#ff5f00; color:#fff; }
 .checkbox-group { display:flex; align-items:center; margin:15px 0; font-size:14px; }
 .checkbox-group input[type="checkbox"] { margin-right:10px; }
 .checkbox-group a { margin-left:5px; color:#007bff; text-decoration:none; font-weight:bold; }
 .checkbox-group a:hover { text-decoration:underline; }
-footer { background:#111; color:#fff; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; font-size:16px; width:100%; box-sizing:border-box; margin-top:auto; }
+footer { background:#111; color:#fff; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; font-size:16px; margin-top:auto; }
 .marquee { flex:1; margin-left:20px; overflow:hidden; white-space:nowrap; }
 .marquee span { display:inline-block; padding-left:100%; animation: scroll 15s linear infinite; }
 @keyframes scroll { from {transform:translateX(0);} to {transform:translateX(-100%);} }
+#numpad button, #vkeyboard button { flex:1; padding:12px; border-radius:8px; font-size:16px; border:1px solid #000; cursor:pointer; margin:2px; transition:0.2s; }
+#numpad button:hover, #vkeyboard button:hover { background:#007bff; color:#fff; }
+#share-summary { background:#fff; padding:15px; border:1px solid #000; width:350px; min-height:600px; max-height:1200px; overflow-y:auto; font-size:12px; font-family:monospace; }
+.vkeyboard-container { display:flex; flex-wrap:wrap; max-width:420px; margin-top:10px; }
+.shift-active { background:#007bff; color:#fff !important; }
 </style>
 </head>
 <body>
@@ -41,28 +44,26 @@ footer { background:#111; color:#fff; padding:10px 20px; display:flex; justify-c
 <div class="form-container">
   <div class="header">
     <p>Daftar Akaun SKYLINES eWallet Baru</p>
-    <p class="info-note">Sila daftarkan SKYLINES eWallet anda dan lengkapkan proses KYC. Kemas kini nama penuh anda mengikut maklumat dari KAD PENGENALAN ANDA. Percanggahan dalam butiran profil boleh mengakibatkan penolakan pembikinan akaun.</p>
+    <p class="info-note">Lengkapkan semua info mengikut KAD PENGENALAN. Percanggahan boleh menyebabkan akaun ditolak.</p>
   </div>
 
   <form id="multi-step-form">
-    <!-- Step 1 -->
+    <!-- Step 1: Nama + DOB -->
     <div class="form-step active" data-step="1">
-      <div class="step-hint">LANGKAH 1: NAMA DAN TARIKH LAHIR</div>
-      <div class="form-field"><label for="first-name">NAMA AWAL</label><input type="text" id="first-name" name="first-name" placeholder="SITI" required></div>
-      <div class="form-field"><label for="last-name">NAMA TERAKHIR</label><input type="text" id="last-name" name="last-name" placeholder="BIN .........." required></div>
-      <div class="form-field"><label for="dob">TARIKH LAHIR</label><input type="date" id="dob" name="dob" required></div>
+      <div class="form-field"><label>NAMA AWAL</label><input type="text" id="first-name" placeholder="SITI" onclick="activeField('first-name')"></div>
+      <div class="form-field"><label>NAMA TERAKHIR</label><input type="text" id="last-name" placeholder="BIN ......" onclick="activeField('last-name')"></div>
+      <div class="form-field"><label>TARIKH LAHIR</label><input type="date" id="dob"></div>
       <div class="button-group">
-        <button type="button" class="btn btn-batalkan" onclick="window.location.href='https://https://asterasmkmii.github.io/atmhomesw/'">Batalkan</button>
+        <button type="button" class="btn btn-batalkan" onclick="window.location.href='https://asterasmkmii.github.io/atmskylinesewallet/'">Batalkan</button>
         <button type="button" class="btn btn-next" onclick="nextStep()">Seterusnya</button>
       </div>
     </div>
 
-    <!-- Step 2 -->
+    <!-- Step 2: Address, Phone, Email -->
     <div class="form-step" data-step="2">
-      <div class="step-hint">LANGKAH 2: ALAMAT, NOMBOR TELEFON DAN EMEL</div>
-      <div class="form-field"><label for="address">ALAMAT</label><input type="text" id="address" name="address" placeholder="Alamat" required></div>
-      <div class="form-field"><label for="phone">NOMBOR TEL</label><input type="tel" id="phone" name="phone" placeholder="Telefon" required></div>
-      <div class="form-field"><label for="email">EMEL</label><input type="email" id="email" name="email" placeholder="Email" required></div>
+      <div class="form-field"><label>ALAMAT</label><input type="text" id="address" placeholder="Alamat" onclick="activeField('address')"></div>
+      <div class="form-field"><label>NOMBOR TEL</label><input type="tel" id="phone" placeholder="Telefon" onclick="activeField('phone')"></div>
+      <div class="form-field"><label>EMEL</label><input type="email" id="email" placeholder="Email" onclick="activeField('email')"></div>
       <div class="button-group">
         <button type="button" class="btn btn-back" onclick="prevStep()">Sebelumnya</button>
         <button type="button" class="btn btn-next" onclick="nextStep()">Seterusnya</button>
@@ -71,24 +72,38 @@ footer { background:#111; color:#fff; padding:10px 20px; display:flex; justify-c
 
     <!-- Step 3: PIN -->
     <div class="form-step" data-step="3">
-      <div class="step-hint">LANGKAH 3: Tetapkan 6 Digit PIN</div>
-      <div class="form-field"><label for="pin">PIN</label><input type="password" id="pin" name="pin" maxlength="6" pattern="\d{6}" placeholder="6 Digit PIN" required></div>
-      <div class="form-field"><label for="pin-confirm">Sahkan PIN</label><input type="password" id="pin-confirm" name="pin-confirm" maxlength="6" pattern="\d{6}" placeholder="Sahkan PIN" required></div>
+      <div class="form-field"><label>PIN</label><input type="password" id="pin" maxlength="6" placeholder="6 Digit PIN" readonly onclick="activePin('pin')"></div>
+      <div class="form-field"><label>Confirm PIN</label><input type="password" id="pin-confirm" maxlength="6" placeholder="Sahkan PIN" readonly onclick="activePin('pin-confirm')"></div>
+
+      <div id="numpad" style="display:flex; flex-wrap:wrap; max-width:210px; margin-top:10px;">
+        <button type="button" onclick="pressNum(1)">1</button>
+        <button type="button" onclick="pressNum(2)">2</button>
+        <button type="button" onclick="pressNum(3)">3</button>
+        <button type="button" onclick="pressNum(4)">4</button>
+        <button type="button" onclick="pressNum(5)">5</button>
+        <button type="button" onclick="pressNum(6)">6</button>
+        <button type="button" onclick="pressNum(7)">7</button>
+        <button type="button" onclick="pressNum(8)">8</button>
+        <button type="button" onclick="pressNum(9)">9</button>
+        <button type="button" onclick="backspacePin()">⌫</button>
+        <button type="button" onclick="pressNum(0)">0</button>
+        <button type="button" onclick="clearPin()">C</button>
+      </div>
+
       <div class="button-group">
         <button type="button" class="btn btn-back" onclick="prevStep()">Sebelumnya</button>
         <button type="button" class="btn btn-next" onclick="nextStep()">Seterusnya</button>
       </div>
     </div>
 
-    <!-- Step 4: Terms + Next -->
+    <!-- Step 4: Terms + summary -->
     <div class="form-step" data-step="4">
-      <div class="step-hint">LANGKAH 4: Terma & Ringkasan</div>
       <div class="checkbox-group">
         <input type="checkbox" id="terms">
-        <label for="terms">Saya patuhi terma dan syarat</label>
+        <label>Saya patuhi terma & syarat</label>
         <a href="#" target="_blank">Terma & Syarat</a>
       </div>
-      <div style="margin-top:15px;">
+      <div style="margin-top:10px;">
         <strong>Ringkasan Maklumat:</strong>
         <p>Nama: <span id="summary-name"></span></p>
         <p>Nombor Tel: <span id="summary-phone"></span></p>
@@ -100,151 +115,149 @@ footer { background:#111; color:#fff; padding:10px 20px; display:flex; justify-c
       </div>
     </div>
 
-    <!-- Step 5: Share as Image -->
+    <!-- Step 5: Resit -->
     <div class="form-step" data-step="5">
-      <div class="step-hint">LANGKAH 5: Resit Maklumat</div>
-      <div id="share-summary" style="background:#fff; padding:15px; border:1px solid #000;">
-        <strong>Maklumat anda:</strong>
-        <p>Nama: <span id="summary-name2"></span></p>
-        <p>TARIKH LAHIR: <span id="summary-dob2"></span></p>
-        <p>Alamat: <span id="summary-address2"></span></p>
-        <p>Nombor Tel: <span id="summary-phone2"></span></p>
-        <p>Email: <span id="summary-email2"></span></p>
+      <div class="step-hint">Resit Maklumat Akaun</div>
+      <div id="share-summary">
+        <strong>SKYLINES eWallet Registration Receipt</strong><br>
+        ----------------------------------------<br>
+        Nama: <span id="summary-name2"></span><br>
+        TARIKH LAHIR: <span id="summary-dob2"></span><br>
+        Alamat: <span id="summary-address2"></span><br>
+        Nombor Tel: <span id="summary-phone2"></span><br>
+        Email: <span id="summary-email2"></span><br>
+        PIN: <span id="summary-pin2"></span><br>
+        Token: false<br>
+        KYC Confirmed: false<br>
+        Timestamp: <span id="summary-timestamp"></span><br>
+        ----------------------------------------<br>
+        TERIMA KASIH MENGGUNAKAN SKYLINES eWallet
       </div>
-      <div class="button-group" style="margin-top:15px;">
+      <div class="button-group" style="margin-top:10px;">
         <button type="button" class="btn btn-back" onclick="prevStep()">Sebelumnya</button>
-        <button type="button" class="btn btn-next" onclick="shareImage()">Cetak</button>
-        <button type="button" class="btn btn-batalkan" onclick="window.location.href='https://https://asterasmkmii.github.io/atmhomesw/'">Balik</button>
+        <button type="button" class="btn btn-next" onclick="shareImage()">Cetak / Share</button>
+        <button type="button" class="btn btn-batalkan" onclick="window.location.href='https://asterasmkmii.github.io/atmskylinesewallet/'">Balik</button>
       </div>
     </div>
   </form>
+
+  <!-- Virtual Keyboard -->
+  <div id="vkeyboard" class="vkeyboard-container"></div>
+  <button id="shift-btn" style="margin-top:5px;">Shift</button>
 </div>
 
 <footer>
   <div id="datetime"></div>
-  <div class="marquee"><span>SELAMAT DATANG KE ATM SKYLINES E-WALLET | ATM INI HANYA BUKA DARI 8:00 PAGI HINGGA 10:00 MALAM | SELAMAT MENGGUNA</span></div>
+  <div class="marquee"><span>SELAMAT DATANG KE ATM SKYLINES E-WALLET | ATM INI BUKA 8:00 PAGI - 10:00 MALAM | SELAMAT MENGGUNA</span></div>
 </footer>
 
 <script>
-// Firebase config awak
-const firebaseConfig = {
-  apiKey: "AIzaSyDcAq_rnJ3342lCpxalebddMFGDFUrypUg",
-  authDomain: "aeris-data-smkmii.firebaseapp.com",
-  projectId: "aeris-data-smkmii",
-  storageBucket: "aeris-data-smkmii.firebasestorage.app",
-  messagingSenderId: "660083140877",
-  appId: "1:660083140877:web:ebc7787b870c12e268e844"
-};
+// Firebase
+const firebaseConfig = { apiKey:"AIzaSyDcAq_rnJ3342lCpxalebddMFGDFUrypUg", authDomain:"aeris-data-smkmii.firebaseapp.com", projectId:"aeris-data-smkmii", storageBucket:"aeris-data-smkmii.firebasestorage.app", messagingSenderId:"660083140877", appId:"1:660083140877:web:ebc7787b870c12e268e844"};
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const db=firebase.firestore();
 
 // Clock
-function updateClock(){
-  const now=new Date();
-  document.getElementById("datetime").textContent=
-    now.toLocaleDateString("ms-MY",{weekday:"long",year:"numeric",month:"long",day:"numeric"})+
-    " | "+now.toLocaleTimeString("ms-MY");
-}
+function updateClock(){ const now=new Date(); document.getElementById("datetime").textContent=now.toLocaleDateString("ms-MY",{weekday:"long",year:"numeric",month:"long",day:"numeric"})+" | "+now.toLocaleTimeString("ms-MY"); }
 setInterval(updateClock,1000); updateClock();
 
-// Multi-step form
-let currentStep = 1;
-const steps = document.querySelectorAll(".form-step");
-function showStep(n){
-  steps.forEach(s=>s.classList.remove("active"));
-  const step = document.querySelector(`.form-step[data-step="${n}"]`);
-  step.classList.add("active");
-
-  if(n===4 || n===5){ fillSummary(); }
-
-  // Save data to Firebase automatically when step 5 muncul
-  if(n===5){ submitToFirebase(); }
-}
-function nextStep(){
-  if(currentStep===1 && !document.getElementById('first-name').value) return alert('Isi nama awal dahulu');
-  if(currentStep===2 && !document.getElementById('address').value) return alert('Isi alamat dahulu');
-  if(currentStep===3){
-    const pin = document.getElementById('pin').value;
-    const pinConfirm = document.getElementById('pin-confirm').value;
-    if(pin.length!==6 || pin!==pinConfirm) return alert('PIN tidak sah atau tidak sepadan');
-  }
-  if(currentStep===4 && !document.getElementById('terms').checked){
-    return alert('Sila setuju terma & syarat dahulu');
-  }
-  if(currentStep<5){ currentStep++; showStep(currentStep); }
+// Multi-step
+let currentStep=1;
+const steps=document.querySelectorAll(".form-step");
+function showStep(n){ steps.forEach(s=>s.classList.remove("active")); document.querySelector(`.form-step[data-step="${n}"]`).classList.add("active"); if(n>=4) fillSummary(); if(n===5) submitToFirebase(); }
+function nextStep(){ 
+  if(currentStep===1 && !document.getElementById('first-name').value) return alert('Isi nama awal'); 
+  if(currentStep===2 && !document.getElementById('address').value) return alert('Isi alamat'); 
+  if(currentStep===3){ const pin=document.getElementById('pin').value; const pinC=document.getElementById('pin-confirm').value; if(pin.length!==6 || pin!==pinC) return alert('PIN tidak sah atau sepadan'); }
+  if(currentStep===4 && !document.getElementById('terms').checked) return alert('Setuju terma dahulu'); 
+  if(currentStep<5){ currentStep++; showStep(currentStep); } 
 }
 function prevStep(){ if(currentStep>1){ currentStep--; showStep(currentStep); } }
 
+// Summary fill
 function fillSummary(){
-  const name = document.getElementById('first-name').value + ' ' + document.getElementById('last-name').value;
-  const dob = document.getElementById('dob').value;
-  const address = document.getElementById('address').value;
-  const phone = document.getElementById('phone').value;
-  const email = document.getElementById('email').value;
+  const name=document.getElementById('first-name').value+" "+document.getElementById('last-name').value;
+  const dob=document.getElementById('dob').value;
+  const address=document.getElementById('address').value;
+  const phone=document.getElementById('phone').value;
+  const email=document.getElementById('email').value;
+  const pin=document.getElementById('pin').value;
 
-  document.getElementById('summary-name').textContent = name;
-  document.getElementById('summary-dob').textContent = dob;
-  document.getElementById('summary-address').textContent = address;
-  document.getElementById('summary-phone').textContent = phone.replace(/.(?=.{2})/g,"*");
-  document.getElementById('summary-email').textContent = email.replace(/.(?=.{3}@)/g,"*");
+  document.getElementById('summary-name').textContent=name;
+  document.getElementById('summary-phone').textContent=phone.replace(/.(?=.{2})/g,"*");
+  document.getElementById('summary-email').textContent=email.replace(/.(?=.{3}@)/g,"*");
 
-  document.getElementById('summary-name2').textContent = name;
-  document.getElementById('summary-dob2').textContent = dob;
-  document.getElementById('summary-address2').textContent = address;
-  document.getElementById('summary-phone2').textContent = phone.replace(/.(?=.{2})/g,"*");
-  document.getElementById('summary-email2').textContent = email.replace(/.(?=.{3}@)/g,"*");
+  document.getElementById('summary-name2').textContent=name;
+  document.getElementById('summary-dob2').textContent=dob;
+  document.getElementById('summary-address2').textContent=address;
+  document.getElementById('summary-phone2').textContent=phone.replace(/.(?=.{2})/g,"*");
+  document.getElementById('summary-email2').textContent=email.replace(/.(?=.{3}@)/g,"*");
+  document.getElementById('summary-pin2').textContent=pin.replace(/.(?=.{4})/g,"*");
+  document.getElementById('summary-timestamp').textContent=new Date().toLocaleString();
 }
 
-// Enable Next button in Step 4 only if terms ticked
-const termsCheckbox = document.getElementById('terms');
-const step4NextBtn = document.getElementById('step4-next');
-termsCheckbox.addEventListener('change', ()=>{
-  step4NextBtn.disabled = !termsCheckbox.checked;
-  step4NextBtn.style.opacity = termsCheckbox.checked ? '1' : '0.5';
-});
+// Step4 Next btn
+const termsCheckbox=document.getElementById('terms');
+const step4NextBtn=document.getElementById('step4-next');
+termsCheckbox.addEventListener('change', ()=>{ step4NextBtn.disabled=!termsCheckbox.checked; step4NextBtn.style.opacity=termsCheckbox.checked?'1':'0.5'; });
 
-// Submit to Firestore with token=false
+// Firebase submit
 function submitToFirebase(){
   db.collection("registerations").add({
-    firstName: document.getElementById('first-name').value,
-    lastName: document.getElementById('last-name').value,
-    dob: document.getElementById('dob').value,
-    address: document.getElementById('address').value,
-    phone: document.getElementById('phone').value,
-    email: document.getElementById('email').value,
-    pin: document.getElementById('pin').value,
-    token: false,
-    finalconfirm: false,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  })
-  .then(()=>console.log("Data saved to Firestore with token=false"))
-  .catch(err=>console.error("Firestore error:",err));
+    firstName:document.getElementById('first-name').value,
+    lastName:document.getElementById('last-name').value,
+    dob:document.getElementById('dob').value,
+    address:document.getElementById('address').value,
+    phone:document.getElementById('phone').value,
+    email:document.getElementById('email').value,
+    pin:document.getElementById('pin').value,
+    token:false,
+    finalconfirm:false,
+    timestamp:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>console.log("Saved")).catch(err=>console.error(err));
 }
 
 // Share as image
 function shareImage(){
-  submitToFirebase();
-  const element = document.getElementById('share-summary');
+  const element=document.getElementById('share-summary');
   html2canvas(element).then(canvas=>{
     canvas.toBlob(blob=>{
-      const file = new File([blob], "SKYLINES_Summary.png",{type:"image/png"});
-      if(navigator.share){
-        navigator.share({
-          files:[file],
-          title:"SKYLINES eWallet Registration",
-          text:"Ringkasan Pendaftaran SKYLINES eWallet"
-        }).then(()=>{}).catch(err=>alert('Gagal share: '+err));
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = "SKYLINES_Summary.png";
-        a.click();
-        URL.revokeObjectURL(url);
-      }
+      const file=new File([blob],"SKYLINES_Summary.png",{type:"image/png"});
+      if(navigator.share){ navigator.share({files:[file],title:"SKYLINES eWallet",text:"Ringkasan Pendaftaran"}).catch(err=>alert(err)); }
+      else { const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download="SKYLINES_Summary.png"; a.click(); URL.revokeObjectURL(url); }
     });
   });
 }
+
+// --- Virtual Keyboard ---
+let activeFieldInput=null;
+function activeField(id){ activeFieldInput=document.getElementById(id); showKeyboard(); }
+function showKeyboard(){ document.getElementById('vkeyboard').style.display='flex'; }
+const shiftBtn=document.getElementById('shift-btn');
+let shiftActive=false;
+shiftBtn.addEventListener('click', ()=>{ shiftActive=!shiftActive; shiftBtn.classList.toggle('shift-active'); updateKeyboard(); });
+
+const keyboardKeys='q w e r t y u i o p a s d f g h j k l z x c v b n m 1 2 3 4 5 6 7 8 9 0 @ . - _ ,'.split(' ');
+const vkbContainer=document.getElementById('vkeyboard');
+function updateKeyboard(){
+  vkbContainer.innerHTML='';
+  keyboardKeys.forEach(k=>{
+    let key=k; if(/[a-z]/.test(k)) key=shiftActive?k.toUpperCase():k.toLowerCase();
+    const btn=document.createElement('button'); btn.type='button'; btn.textContent=key;
+    btn.onclick=()=>{ if(activeFieldInput) activeFieldInput.value+=key; };
+    vkbContainer.appendChild(btn);
+  });
+  const backBtn=document.createElement('button'); backBtn.textContent='⌫'; backBtn.onclick=()=>{ if(activeFieldInput) activeFieldInput.value=activeFieldInput.value.slice(0,-1); }; vkbContainer.appendChild(backBtn);
+  const clearBtn=document.createElement('button'); clearBtn.textContent='C'; clearBtn.onclick=()=>{ if(activeFieldInput) activeFieldInput.value=''; }; vkbContainer.appendChild(clearBtn);
+}
+updateKeyboard();
+
+// --- PIN numpad ---
+let activePinField=null;
+function activePin(id){ activePinField=document.getElementById(id); }
+function pressNum(n){ if(activePinField && activePinField.value.length<6) activePinField.value+=n; }
+function backspacePin(){ if(activePinField) activePinField.value=activePinField.value.slice(0,-1); }
+function clearPin(){ if(activePinField) activePinField.value=''; }
 </script>
 
 </body>
